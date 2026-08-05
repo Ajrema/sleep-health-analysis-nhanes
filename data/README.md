@@ -29,16 +29,12 @@ https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017
 
 ## Uso de los datos
 
-Los archivos se cargan en el notebook mediante rutas relativas, permitiendo que el proyecto pueda ejecutarse en diferentes ordenadores y sistemas operativos.
-
-Ejemplo:
+El notebook principal se encuentra en la carpeta `notebook/`, mientras que los archivos originales están en `data/`.
 
 ```python
 from pathlib import Path
 import pandas as pd
 
-DATA_DIR = Path("data")
+DATA_DIR = Path("../data")
 
 demo = pd.read_sas(DATA_DIR / "DEMO_J.xpt")
-sleep = pd.read_sas(DATA_DIR / "SLQ_J.xpt")
-body = pd.read_sas(DATA_DIR / "BMX_J.xpt")
