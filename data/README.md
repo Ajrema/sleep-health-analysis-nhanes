@@ -1,40 +1,58 @@
-# Datos del proyecto
+# Data
 
-Esta carpeta contiene los archivos originales utilizados en el proyecto:
+This folder contains the original public-use SAS Transport files used in the project **Sleep Duration and Health Indicators Analysis**.
 
-**Asociación entre la duración del sueño, las características demográficas, los indicadores de salud y los factores del estilo de vida: un análisis transversal utilizando datos de NHANES 2017–2018.**
+## Source
 
-## Fuente de los datos
+The data come from the **National Health and Nutrition Examination Survey (NHANES) 2017–2018**, produced by the National Center for Health Statistics, part of the U.S. Centers for Disease Control and Prevention (CDC).
 
-Los datos proceden de la encuesta pública **National Health and Nutrition Examination Survey (NHANES) 2017–2018**, desarrollada por el National Center for Health Statistics de los Centers for Disease Control and Prevention (CDC) de Estados Unidos.
+Official documentation: [NHANES 2017–2018](https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017)
 
-Los archivos se distribuyen originalmente en formato SAS Transport (`.xpt`).
+The files are redistributed in their original `.xpt` format to make the analysis reproducible offline. They were not created or modified by the project author.
 
-Fuente oficial:  
-https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2017
+## Included modules
 
-## Archivos incluidos
+| File | NHANES module | Content used in the project |
+|---|---|---|
+| `DEMO_J.xpt` | Demographics | Age, gender, race/ethnicity, education, marital status, poverty index |
+| `SLQ_J.xpt` | Sleep Disorders | Workday/weekend sleep, snoring, breathing interruptions, sleep trouble, daytime sleepiness |
+| `BMX_J.xpt` | Body Measures | BMI and waist circumference |
+| `GHB_J.xpt` | Glycohemoglobin | HbA1c |
+| `BPX_J.xpt` | Blood Pressure | Systolic and diastolic blood pressure |
+| `HDL_J.xpt` | HDL Cholesterol | HDL cholesterol |
+| `PAQ_J.xpt` | Physical Activity | Recreation, transport activity, and sedentary time |
+| `SMQ_J.xpt` | Smoking | Smoking history and status |
+| `ALQ_J.xpt` | Alcohol Use | Alcohol-consumption frequency |
 
-| Archivo | Contenido |
-|---|---|
-| `DEMO_J.xpt` | Datos demográficos |
-| `SLQ_J.xpt` | Duración y hábitos del sueño |
-| `PAQ_J.xpt` | Actividad física |
-| `SMQ_J.xpt` | Consumo de tabaco |
-| `ALQ_J.xpt` | Consumo de alcohol |
-| `BMX_J.xpt` | Mediciones corporales y antropometría |
-| `GHB_J.xpt` | Hemoglobina glucosilada (HbA1c) |
-| `BPX_J.xpt` | Mediciones de presión arterial |
-| `HDL_J.xpt` | Colesterol HDL |
+## Joining the files
 
-## Uso de los datos
+All modules are merged using `SEQN`, NHANES's unique participant identifier.
 
-El notebook principal se encuentra en la carpeta `notebook/`, mientras que los archivos originales están en `data/`.
+```python
+df = demo.merge(sleep, on="SEQN", how="left")
+```
+
+## Portable loading
+
+The notebooks are stored in `notebooks/` and the data are stored in the sibling directory `data/`. The loading block supports execution either from the repository root or from inside `notebooks/`:
 
 ```python
 from pathlib import Path
 import pandas as pd
 
-DATA_DIR = Path("../data")
+if Path("data").is_dir():
+    DATA_DIR = Path("data")
+elif Path("../data").is_dir():
+    DATA_DIR = Path("../data")
+else:
+    raise FileNotFoundError("The data directory could not be found.")
 
 demo = pd.read_sas(DATA_DIR / "DEMO_J.xpt")
+sleep = pd.read_sas(DATA_DIR / "SLQ_J.xpt")
+```
+
+This avoids private absolute paths such as `C:\\Users\\...\\data` and allows another user to clone and run the project without editing the file locations.
+
+## Usage note
+
+NHANES data are public-use research data. Consult the official CDC/NCHS documentation for questionnaires, codebooks, variable definitions, and analytical guidance.
